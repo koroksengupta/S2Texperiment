@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script type="text/javascript">
+
+function GetValue()
+{
+    var myarray= new Array("prevailing wind from the east",
+    						"my bank account is overdrawn",
+    						"please provide your date of birth", 
+    						"love means many things", 
+    						"hair gel is very greasy", 
+    						"the living is easy", 
+    						"the quick brown fox jumped", 
+    						"we went grocery shopping", 
+    						"we accept personal checks", 
+    						"santa claus got stuck", 
+    						"sprawling subdivisions are bad", 
+    						"the price of gas is high", 
+    						"universally understood to be wrong", 
+    						"the acceptance speech was boring", 
+    						"you will loose your voice", 
+    						"file all complaints in writing", 
+    						"the generation gap gets wider", 
+    						"a security force of eight thousand");
+
+    var x = Math.floor(Math.random() * myarray.length)
+    var random = myarray[x];
+    // document.getElementById("MyEdit").innerHTML = x;
+   document.getElementById("message").innerHTML=random;
+
+}
+
+// $('p').each(function() {
+//     var $this = $(this);
+//     $this.html($this.text().replace(/\b(\w+)\b/g, "<p>$1</p>"));
+// });
+
+$('p').hover(
+    function() { 
+        $(this).css('background-color','#fff666'); 
+       
+    },
+    function() { 
+        $(this).css('background-color',''); 
+    }
+);
+
+</script>>
+<p id="message" > With every click, a sentence appears </p>
+<input type="button" id="btnSearch" value="Click" onmouseover="GetValue();" />
+
+</body>
+</html>
