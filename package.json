@@ -1,0 +1,27 @@
+{
+  "name": "S2Texperiment",
+  "version": "1.0.0",
+  "description": "The main idea of this experiment is to understand if we can improve S2T by giving it some editing features.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tellkorok/S2Texperiment.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tellkorok/S2Texperiment/issues"
+  },
+  "homepage": "https://github.com/tellkorok/S2Texperiment#readme",
+  "devDependencies": {
+    "typescript": "^2.4.2",
+    "webpack": "^3.5.1"
+  },
+  "dependencies": {
+    "rxjs": "^5.4.2"
+  }
+}
