@@ -1,43 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<title>Speach</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-	<title>Speach</title>
-	<style>
-		.transcribed-text {
-			display: inline-block;
-		}
-		.transcribed-text:hover {
-			cursor: pointer;
-			background-color: red;
-			cursor: hand;
-		}
-		.span-wrapper {
-			margin-left: 3px;
-		}
-		.selected {
-			background-color: green;
-		}
-	</style>
+	<link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
 	<div class="navbar navbar-default navbar-static-top">
 		<div class="container-fluid">
+			<h3>Speech To Text Demo</h3>
 		</div>
 	</div>
 	<div class="container">
-		<div class="result-container well">
-			<div id="result"></div>
-		</div>
+		<div class="col-sx-12">
+			<div class="row">
+				<div class="col-xs-6 text-center">
+					<div id="paragraph-container"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="row result-container well">
+					<div id="result">
 
-		<button class="btn btn-sucess" id="btn-start">Start</button>
-		<button class="btn btn-danger" id="btn-stop">Stop</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sx-12">
+			<div class="button-container">
+				<button class="btn btn-default" id="btn-start">Start</button>
+				<button class="btn btn-info" id="btn-edit">Edit</button>
+				<button class="btn btn-success" id="btn-ok">Ok</button>
+			</div>
+		</div>
 	</div>
-	<script src="node_modules/javascripts/levenshtein.js"></script>
+
+	<script src="node_modules/levenshtein/lib/levenshtein.js"></script>
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
 	<script src="dist/bundle.js"></script>
 </body>
+
 </html>

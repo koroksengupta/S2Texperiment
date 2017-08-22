@@ -69,66 +69,208 @@
 
 "use strict";
 
+Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = __webpack_require__(1);
+const speechtotext_1 = __webpack_require__(2);
 //TODO:
 // currently if editing is done then added element will taken as one word.
-const startBtn = document.getElementById("btn-start");
-const stopBtn = document.getElementById("btn-stop");
-const resultDiv = document.getElementById('result');
-const speechRecognizer = new webkitSpeechRecognition();
-speechRecognizer.continuous = true;
-speechRecognizer.interimResults = true;
-speechRecognizer.lang = 'en-US';
+let startBtn;
+let editBtn;
+let resultDiv;
+let okButton;
+let inputParagraphs;
+let paragraphContainer;
+let currentIndex = 0;
+let isInEditingMode = false;
 let currentParagraph = 0;
 let currentContainer;
-const createContainer = (i) => {
+const showParagraph = () => {
+    paragraphContainer.innerHTML = inputParagraphs[currentIndex];
+};
+// this is impure function.
+const processTranscript = (transcript) => {
+    // let container = getCurrentContainer(currentParagraph);
+    resultDiv.innerHTML = utils_1.wrapWithSpan(utils_1.splitText(transcript)).join(" ");
+};
+const clearResultDiv = () => {
+    setTimeout(() => {
+        resultDiv.innerText = "";
+    }, 500);
+};
+const submitResult = (speechRecognizer) => {
+    // stop the speech api
+    speechRecognizer.stop();
+    const orginalText = inputParagraphs[currentIndex];
+    const resultText = resultDiv.innerText;
+    const l = new Levenshtein(orginalText, resultText);
+    console.log({
+        orginalText,
+        resultText,
+        distance: l.distance
+    });
+    clearResultDiv();
+    currentIndex += 1;
+    showParagraph();
+};
+const bindEvents = (speechRecognizer) => {
+    startBtn.addEventListener('click', (evt) => {
+        speechRecognizer.start();
+    });
+    editBtn.addEventListener('click', (evt) => {
+        isInEditingMode = true;
+        speechRecognizer.stop();
+    });
+    okButton.addEventListener('click', (evt) => {
+        submitResult(speechRecognizer);
+    });
+    let mouseTimer;
+    $(document).on('mouseenter', '.transcribed-text', (evt) => {
+        mouseTimer = setTimeout(() => {
+            $(evt.currentTarget).addClass('selected');
+        }, 1000);
+    });
+    $(document).on('mouseout', '.transcribed-text', (evt) => {
+        $(evt.currentTarget).removeClass('selected');
+        // setTimeout(mouseTimer);
+        console.log('mouse out');
+    });
+};
+const initializeApp = (paragraphs) => {
+    // setup buttons
+    startBtn = document.getElementById('btn-start');
+    editBtn = document.getElementById('btn-edit');
+    resultDiv = document.getElementById('result');
+    okButton = document.getElementById('btn-ok');
+    paragraphContainer = document.getElementById('paragraph-container');
+    inputParagraphs = paragraphs;
+    showParagraph();
+    // initializing our object
+    const speechRecognizer = new speechtotext_1.SpeechToText();
+    speechRecognizer.on('onresult', (event, result) => {
+        processTranscript(result);
+    });
+    bindEvents(speechRecognizer);
+};
+const loadJson = (filePath) => {
+    fetch(filePath).then((rep) => rep.json()).then(data => {
+        initializeApp(data.paragraphs);
+    });
+};
+window.addEventListener('load', (evt) => {
+    loadJson('inputs.json');
+});
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createContainer = (i) => {
     let elem = document.createElement("span");
     elem.id = `container-${i}`;
     elem.classList.add(`span-wrapper`);
     return elem;
 };
-const splitText = (text) => text.split(' ');
-const wrapWithSpan = (texts) => texts.map((elem, index) => `<span class="transcribed-text"> ${elem} </span>`);
-const getCurrentContainer = (containerId, prefix = 'container-') => {
-    let element = document.getElementById(prefix + containerId);
-    if (element == null) {
-        element = createContainer(containerId);
-        resultDiv.appendChild(element);
+exports.splitText = (text) => text.split(' ');
+exports.wrapWithSpan = (texts) => texts.map((elem, index) => `<span class="transcribed-text">${elem}</span>`);
+// Don't delete this
+// const getCurrentContainer = (containerId: number, prefix: string = 'container-') => {
+// 	let element = <HTMLSpanElement>document.getElementById(prefix + containerId)
+// 	if (element == null) {
+// 		element = createContainer(containerId);
+// 		resultDiv!.appendChild(element);
+// 	}
+// 	return element;
+// } 
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const event_1 = __webpack_require__(3);
+class SpeechToText extends event_1.ST2Event {
+    constructor() {
+        super();
+        this.speechRecognizer = new webkitSpeechRecognition();
+        this.speechRecognizer.continuous = true;
+        this.speechRecognizer.interimResults = true;
+        this.speechRecognizer.lang = 'en-US';
+        this.bindEvents();
     }
-    return element;
-};
-const processTranscript = (transcript) => {
-    let container = getCurrentContainer(currentParagraph);
-    console.log(container);
-    container.innerHTML = wrapWithSpan(splitText(transcript)).join(" ");
-};
-speechRecognizer.onresult = (event) => {
-    var result = event.results[event.results.length - 1];
-    if (result[0].confidence > 0.60) {
-        processTranscript(result[0].transcript);
+    bindEvents() {
+        this.speechRecognizer.onresult = (event) => {
+            this.handleOnResult(event);
+        };
+        this.speechRecognizer.onerror = (event) => {
+            this.handleOnError(event);
+        };
     }
-};
-speechRecognizer.onerror = (evt) => {
-    alert("Error occured");
-};
-startBtn.addEventListener('click', (evt) => {
-    currentParagraph += 1;
-    speechRecognizer.start();
-});
-stopBtn.addEventListener('click', (evt) => {
-    speechRecognizer.stop();
-});
-let mouseTimer;
-$(document).on('mouseenter', '.transcribed-text', (evt) => {
-    console.log('mouse enter');
-    mouseTimer = setTimeout(() => {
-        $(evt.currentTarget).addClass('selected');
-    }, 1000);
-});
-$(document).on('mouseout', '.transcribed-text', (evt) => {
-    $(evt.currentTarget).removeClass('selected');
-    // setTimeout(mouseTimer);
-    console.log('mouse out');
-});
+    handleOnError(event) {
+        this.trigger(new Event('onerror'), event);
+    }
+    handleOnResult(event) {
+        var result = event.results[event.results.length - 1];
+        if (result[0].confidence > 0.50) {
+            this.trigger(new Event('onresult'), result[0].transcript);
+        }
+    }
+    start() {
+        this.speechRecognizer.start();
+    }
+    stop() {
+        this.speechRecognizer.stop();
+    }
+}
+exports.SpeechToText = SpeechToText;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+class ST2Event {
+    constructor(_listeners = []) {
+        this._listeners = _listeners;
+    }
+    on(eventType, callFn) {
+        let events = [].concat(this._listeners.map((evtObj) => Object.keys(evtObj)));
+        if (events.indexOf(eventType) == -1) {
+            let event = { [eventType]: [callFn] };
+            this._listeners.push(event);
+        }
+        else {
+            let event = this._listeners.filter((evetObj) => evetObj[eventType] !== undefined)[0];
+            event[eventType].push(callFn);
+        }
+    }
+    off(eventType, callFn) {
+        let events = [].concat(this._listeners.map((evObj) => Object.keys(evObj)));
+        if (events.indexOf(eventType) == -1)
+            return;
+        let event = this._listeners.filter((evtObj) => evtObj[eventType] !== undefined);
+        let index = event[eventType].indexOf(callFn);
+        if (index >= 0)
+            event[eventType].splice(index, 1);
+    }
+    trigger(eventType, ...values) {
+        let handlers = this._listeners.filter((listeners) => listeners[eventType.type] !== undefined);
+        if (handlers.length == 0)
+            return void 0;
+        handlers = handlers[0][eventType.type];
+        handlers.forEach((handeler) => handeler(eventType, ...values));
+    }
+}
+exports.ST2Event = ST2Event;
 
 
 /***/ })
