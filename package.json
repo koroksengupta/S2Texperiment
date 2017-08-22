@@ -4,7 +4,7 @@
   "description": "The main idea of this experiment is to understand if we can improve S2T by giving it some editing features.",
   "main": "index.js",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack -w"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,8 @@
     "webpack": "^3.5.1"
   },
   "dependencies": {
-    "rxjs": "^5.4.2"
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
+    "levenshtein": "^1.0.5"
   }
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+	<title>Speach</title>
+	<style>
+		.transcribed-text {
+			display: inline-block;
+		}
+		.transcribed-text:hover {
+			cursor: pointer;
+			background-color: red;
+			cursor: hand;
+		}
+		.span-wrapper {
+			margin-left: 3px;
+		}
+		.selected {
+			background-color: green;
+		}
+	</style>
+</head>
+<body>
+	<div class="navbar navbar-default navbar-static-top">
+		<div class="container-fluid">
+		</div>
+	</div>
+	<div class="container">
+		<div class="result-container well">
+			<div id="result"></div>
+		</div>
+
+		<button class="btn btn-sucess" id="btn-start">Start</button>
+		<button class="btn btn-danger" id="btn-stop">Stop</button>
+	</div>
+	<script src="node_modules/javascripts/levenshtein.js"></script>
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="dist/bundle.js"></script>
+</body>
+</html>
