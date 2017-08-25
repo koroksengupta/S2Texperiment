@@ -84,6 +84,8 @@ let currentIndex = 0;
 let isInEditingMode = false;
 let currentParagraph = 0;
 let currentContainer;
+let startTime;
+let endTime;
 const showParagraph = () => {
     paragraphContainer.innerHTML = inputParagraphs[currentIndex];
 };
@@ -103,17 +105,22 @@ const submitResult = (speechRecognizer) => {
     const orginalText = inputParagraphs[currentIndex];
     const resultText = resultDiv.innerText;
     const l = new Levenshtein(orginalText, resultText);
+    endTime = new Date();
+    const totalTime = (endTime.getTime() - startTime.getTime()) / 1000;
     console.log({
         orginalText,
         resultText,
-        distance: l.distance
+        distance: l.distance,
+        timetaken: totalTime + 'seconds'
     });
+    // reset all
     clearResultDiv();
     currentIndex += 1;
     showParagraph();
 };
 const bindEvents = (speechRecognizer) => {
     startBtn.addEventListener('click', (evt) => {
+        startTime = new Date();
         speechRecognizer.start();
     });
     editBtn.addEventListener('click', (evt) => {
