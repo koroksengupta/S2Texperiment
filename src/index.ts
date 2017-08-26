@@ -95,21 +95,33 @@ const bindEvents = (speechRecognizer: SpeechToText) => {
 		placement: 'bottom',
 		toggle: true,
 		content() {
-			return `<div class="btn-group" role="group" aria-label="Basic example">
-			<button type="button" class="btn btn-success">Edit</button>
-			<button type="button" class="btn btn-danger">Delete</button>
+			return `<div class="btn-group" role="group" aria-label="Option Buttons">
+			<button type="button" class="btn btn-success" id="edit">Edit</button>
+			<button type="button" class="btn btn-danger" id="delete">Delete</button>
 		  </div>`;
 		}
 	});
 
 	$(document).on('mouseenter', '.transcribed-text', (evt: MouseEvent) => {
+		const elem = $(evt.currentTarget);
+		if (!isInEditingMode) return;
 		setTimeout(() => {
+			if (elem.hasClass('selected')) return;
 			removeSelected();
 			removePopovers();
-			$(evt.currentTarget).addClass('selected');
-			$(evt.currentTarget).click();
+			elem.addClass('selected');
+			elem.click();
 		}, 1000);
 	});
+
+	$(document).on('click', '#edit', (evt: MouseEvent) => {
+		console.log($(evt.currentTarget));
+	})
+	.on('click', '#delete', (evt: MouseEvent) => {
+		$(".selected").remove();
+		removeSelected();
+		removePopovers();
+	})
 };
 
 const initializeApp = (paragraphs: string[]) => {
