@@ -1,3 +1,6 @@
+.editing-mode > span.transcribed-text {
+	border: 1px dotted blue;
+}
 .transcribed-text {
 	display: inline-block;
 }

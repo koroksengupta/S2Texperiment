@@ -118,28 +118,46 @@ const submitResult = (speechRecognizer) => {
     currentIndex += 1;
     showParagraph();
 };
+const removeSelected = () => {
+    $(".transcribed-text").removeClass("selected");
+};
+const removePopovers = () => {
+    $(".popover").popover('destroy');
+};
 const bindEvents = (speechRecognizer) => {
     startBtn.addEventListener('click', (evt) => {
         startTime = new Date();
         speechRecognizer.start();
     });
     editBtn.addEventListener('click', (evt) => {
+        resultDiv.classList.add('editing-mode');
         isInEditingMode = true;
         speechRecognizer.stop();
     });
     okButton.addEventListener('click', (evt) => {
+        resultDiv.classList.remove('editing-mode');
         submitResult(speechRecognizer);
     });
-    let mouseTimer;
-    $(document).on('mouseenter', '.transcribed-text', (evt) => {
-        mouseTimer = setTimeout(() => {
-            $(evt.currentTarget).addClass('selected');
-        }, 1000);
+    $('body').popover({
+        selector: '.transcribed-text',
+        trigger: 'click',
+        html: true,
+        placement: 'bottom',
+        toggle: true,
+        content() {
+            return `<div class="btn-group" role="group" aria-label="Basic example">
+			<button type="button" class="btn btn-success">Edit</button>
+			<button type="button" class="btn btn-danger">Delete</button>
+		  </div>`;
+        }
     });
-    $(document).on('mouseout', '.transcribed-text', (evt) => {
-        $(evt.currentTarget).removeClass('selected');
-        // setTimeout(mouseTimer);
-        console.log('mouse out');
+    $(document).on('mouseenter', '.transcribed-text', (evt) => {
+        setTimeout(() => {
+            removeSelected();
+            removePopovers();
+            $(evt.currentTarget).addClass('selected');
+            $(evt.currentTarget).click();
+        }, 1000);
     });
 };
 const initializeApp = (paragraphs) => {
