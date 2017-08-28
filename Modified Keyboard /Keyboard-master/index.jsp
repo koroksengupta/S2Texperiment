@@ -60,7 +60,10 @@ button.ui-keyboard-button {
 	<script src="docs/js/demo.js"></script>
 	<script src="docs/js/jquery.tipsy.min.js"></script>
 	<script src="docs/js/prettify.js"></script> <!-- syntax highlighting -->
-		
+	
+	<link href="docs/css/ramin.css" rel="stylesheet">
+	<script src="docs/js/ramin.js"></script>
+	
 </head>
 <body>
 <div id="page-wrap">
@@ -76,15 +79,15 @@ button.ui-keyboard-button {
 <script>
 $(function(){
   // milliseconds before a hovered key is first typed
-  var regularKeyHoverTimer = 200;
+  var regularKeyHoverTimer = 1500;
   
   // milliseconds (ms) unitl the hover key starts repeating
-  var regularKeyHoverRepeat = 1000;
+  var regularKeyHoverRepeat = 0;
   // approximate repeat rate in characters per second
-  var regularKeyRepeatRate = 3;
+  var regularKeyRepeatRate = 1;
   // milliseconds before an action (shift, accept & cancel) is performed
   // we don't want to repeat action keys!
-  var actionKeyHoverTimer = 1000;
+  var actionKeyHoverTimer = 1500;
 
   var internalTimer, lastKey;
 
@@ -100,6 +103,7 @@ $(function(){
   $('#keyboard').keyboard({
     // open the keyboard popup on input mouseenter
     //openOn: 'mouseenter',
+	
     repeatDelay: regularKeyHoverRepeat,
     repeatRate: regularKeyRepeatRate,
     visible: function(event, keyboard) {
