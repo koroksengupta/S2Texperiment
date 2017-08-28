@@ -1,0 +1,32 @@
+.editing-mode > span.transcribed-text {
+	border: 1px dotted blue;
+}
+.transcribed-text {
+	display: inline-block;
+}
+.transcribed-text:hover {
+	cursor: pointer;
+	background-color: red;
+	cursor: hand;
+}
+.span-wrapper {
+	margin-left: 3px;
+}
+.selected {
+	background-color: green;
+}
+.button-container {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 221px;
+}
+.container-fluid > h3 {
+	display: block;
+	text-align: center;
+	color: white;
+	margin-bottom: 20px;
+}
+.navbar-static-top {
+	background-color: #2780e3;
+}
