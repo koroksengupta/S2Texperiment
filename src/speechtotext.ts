@@ -39,4 +39,8 @@ export class SpeechToText extends ST2Event {
 	stop() {
 		this.speechRecognizer.stop();
 	}
+
+	abort() {
+		this.speechRecognizer.abort();
+	}
 }
