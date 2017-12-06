@@ -119,24 +119,100 @@ const submitResult = (speechRecognizer) => {
     showParagraph();
 };
 const removeSelected = () => {
+    $('#keyboard').val('');
     $(".transcribed-text").removeClass("selected");
 };
 const removePopovers = () => {
     $(".popover").popover('destroy');
 };
+// keyboard plugins
+// milliseconds before a hovered key is first typed
+var regularKeyHoverTimer = 1500;
+// milliseconds (ms) unitl the hover key starts repeating
+var regularKeyHoverRepeat = 0;
+// approximate repeat rate in characters per second
+var regularKeyRepeatRate = 1;
+// milliseconds before an action (shift, accept & cancel) is performed
+// we don't want to repeat action keys!
+var actionKeyHoverTimer = 1500;
+var internalTimer, lastKey;
+function startTimer($key, isAction) {
+    clearTimeout(internalTimer);
+    // if it's an action key, wait longer AND do not repeat
+    internalTimer = setTimeout(function () {
+        // use 'mousedown' to trigger typing
+        $key.trigger('mousedown');
+    }, isAction ? actionKeyHoverTimer : regularKeyHoverTimer);
+}
+$('#keyboard').keyboard({
+    repeatDelay: regularKeyHoverRepeat,
+    repeatRate: regularKeyRepeatRate,
+    visible: function (event, keyboard) {
+        keyboard.$keyboard.find('button')
+            .on('mouseenter', function (event) {
+            var $key = $(event.currentTarget), action = $key.attr('data-action'), isAction = action in $.keyboard.keyaction;
+            // don't repeat action keys
+            if (isAction && keyboard.last.key === action)
+                return;
+            startTimer($key, isAction);
+        })
+            .on('mouseleave', function () {
+            clearTimeout(internalTimer);
+        });
+    },
+    hidden: function () {
+        clearTimeout(internalTimer);
+    },
+    accepted: function (event, keyboard, el) {
+        var value = el.value;
+        $(".selected").text(value);
+    },
+    canceled: function (event, keyboard, el) {
+        removeSelected();
+    },
+    beforeClose: function () {
+        setTimeout(function () {
+            removeSelected();
+        }, 100);
+    }
+});
 const bindEvents = (speechRecognizer) => {
     startBtn.addEventListener('click', (evt) => {
         startTime = new Date();
         speechRecognizer.start();
+        $(evt.currentTarget).css('display', 'none');
     });
     editBtn.addEventListener('click', (evt) => {
-        resultDiv.classList.add('editing-mode');
-        isInEditingMode = true;
+        var results = resultDiv.innerText;
+        if (results.trim() == '')
+            return false;
+        isInEditingMode = !isInEditingMode;
+        if (isInEditingMode) {
+            resultDiv.classList.add('editing-mode');
+        }
+        else {
+            resultDiv.classList.remove('editing-mode');
+        }
         speechRecognizer.stop();
     });
     okButton.addEventListener('click', (evt) => {
+        $(evt.currentTarget).attr('disabled', true);
+        speechRecognizer.abort();
+        speechRecognizer.stop();
+        isInEditingMode = false;
         resultDiv.classList.remove('editing-mode');
-        submitResult(speechRecognizer);
+        try {
+            speechRecognizer.start();
+        }
+        catch (err) {
+            setTimeout(() => {
+                speechRecognizer.start();
+            }, 200);
+        }
+        finally {
+            submitResult(speechRecognizer);
+            $(evt.currentTarget).removeAttr('disabled');
+        }
     });
     $('body').popover({
         selector: '.transcribed-text',
@@ -165,12 +241,23 @@ const bindEvents = (speechRecognizer) => {
         }, 1000);
     });
     $(document).on('click', '#edit', (evt) => {
-        console.log($(evt.currentTarget));
+        removePopovers();
+        $("#keyboard").trigger('focus');
     })
         .on('click', '#delete', (evt) => {
         $(".selected").remove();
         removeSelected();
         removePopovers();
+    });
+    let timer;
+    $(document).on('mouseover', '.hoverClickable', (e) => {
+        const hoveredElement = $(e.currentTarget).attr('id');
+        setTimeout(() => {
+            $("#" + hoveredElement)[0].click();
+        }, 1500);
+    });
+    $(document).on('mouseout', '.hoverClickable', (e) => {
+        clearInterval(timer);
     });
 };
 const initializeApp = (paragraphs) => {
@@ -264,6 +351,9 @@ class SpeechToText extends event_1.ST2Event {
     }
     stop() {
         this.speechRecognizer.stop();
+    }
+    abort() {
+        this.speechRecognizer.abort();
     }
 }
 exports.SpeechToText = SpeechToText;
