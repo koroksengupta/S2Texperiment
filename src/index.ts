@@ -5,6 +5,7 @@ declare var Levenshtein: any;
 declare var webkitSpeechRecognition:any;
 declare var $:any;
 
+
 //TODO:
 // currently if editing is done then added element will taken as one word.
 
@@ -63,11 +64,74 @@ const submitResult = (speechRecognizer: SpeechToText) => {
 };
 
 const removeSelected = () => {
+	$('#keyboard').val('');
 	$(".transcribed-text").removeClass("selected");
 }
 const removePopovers = () => {
 	$(".popover").popover('destroy');
 }
+
+// keyboard plugins
+// milliseconds before a hovered key is first typed
+var regularKeyHoverTimer = 1500;
+
+// milliseconds (ms) unitl the hover key starts repeating
+var regularKeyHoverRepeat = 0;
+// approximate repeat rate in characters per second
+var regularKeyRepeatRate = 1;
+// milliseconds before an action (shift, accept & cancel) is performed
+// we don't want to repeat action keys!
+var actionKeyHoverTimer = 1500;
+
+var internalTimer: number, lastKey: number;
+
+function startTimer($key:any, isAction: any) {
+	clearTimeout(internalTimer);
+	// if it's an action key, wait longer AND do not repeat
+	internalTimer = setTimeout(function() {
+	// use 'mousedown' to trigger typing
+	$key.trigger('mousedown');
+	}, isAction ? actionKeyHoverTimer : regularKeyHoverTimer);
+}
+
+$('#keyboard').keyboard({
+	repeatDelay: regularKeyHoverRepeat,
+	repeatRate: regularKeyRepeatRate,
+	visible: function(event: any, keyboard: any) {
+		keyboard.$keyboard.find('button')
+			.on('mouseenter', function(event: any) {
+				var $key = $(event.currentTarget),
+					action = $key.attr('data-action'),
+					isAction = action in $.keyboard.keyaction;
+				// don't repeat action keys
+				if (isAction && keyboard.last.key === action) return;
+				startTimer($key, isAction);
+			})
+			.on('mouseleave', function() {
+				clearTimeout(internalTimer);
+			});
+		},
+	hidden: function() {
+		clearTimeout(internalTimer);
+	},
+	accepted : function(event: any, keyboard: any, el: any) {
+		var value = el.value;
+		
+		$(".selected").text(value);
+		
+	},
+	canceled: function(event: Event, keyboard: any, el: any) {
+		removeSelected();
+	},
+	beforeClose: function() {
+		
+		
+		
+		setTimeout(function() {
+			removeSelected();
+		}, 100);
+	}
+});
 
 
 
@@ -75,17 +139,39 @@ const bindEvents = (speechRecognizer: SpeechToText) => {
 	startBtn!.addEventListener('click', (evt: MouseEvent) => {
 		startTime = new Date()
 		speechRecognizer.start();
+		$(evt.currentTarget).css('display', 'none');
 	});
 
 	editBtn!.addEventListener('click', (evt: MouseEvent) => {
-		resultDiv.classList.add('editing-mode');
-		isInEditingMode = true;
+		var results = resultDiv.innerText;
+		if (results.trim() == '') return false;
+
+		isInEditingMode = !isInEditingMode;
+		if (isInEditingMode) {
+			resultDiv.classList.add('editing-mode');
+		} else {
+			resultDiv.classList.remove('editing-mode');
+		}
 		speechRecognizer.stop();
 	});
 
 	okButton!.addEventListener('click', (evt: MouseEvent) => {
+		$(evt.currentTarget).attr('disabled', true);
+		speechRecognizer.abort();
+		speechRecognizer.stop();
+		isInEditingMode = false;
 		resultDiv.classList.remove('editing-mode');
-		submitResult(speechRecognizer);
+
+		try {
+			speechRecognizer.start();
+		} catch(err) {
+			setTimeout(() => {
+				speechRecognizer.start();
+			}, 200);
+		} finally {
+			submitResult(speechRecognizer);
+			$(evt.currentTarget).removeAttr('disabled');
+		}
 	});
 
 	$('body').popover({
@@ -115,13 +201,25 @@ const bindEvents = (speechRecognizer: SpeechToText) => {
 	});
 
 	$(document).on('click', '#edit', (evt: MouseEvent) => {
-		console.log($(evt.currentTarget));
+		removePopovers();
+		$("#keyboard").trigger('focus');
 	})
 	.on('click', '#delete', (evt: MouseEvent) => {
 		$(".selected").remove();
 		removeSelected();
 		removePopovers();
-	})
+	});
+
+	let timer: number;
+	$(document).on( 'mouseover', '.hoverClickable', (e: MouseEvent) => {
+		const hoveredElement = $(e.currentTarget).attr('id');
+		setTimeout(() => {
+			$("#" + hoveredElement)[0].click();
+		}, 1500);
+	});
+	$( document ).on( 'mouseout', '.hoverClickable', (e: MouseEvent) => {
+		clearInterval(timer);
+	});
 };
 
 const initializeApp = (paragraphs: string[]) => {
@@ -150,7 +248,7 @@ const loadJson = (filePath:string) => {
 };
 
 window.addEventListener('load', (evt:Event) => {
-	loadJson('inputs.json')
+	loadJson('inputs.json');
 });
 
 
