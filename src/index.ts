@@ -64,6 +64,7 @@ const submitResult = (speechRecognizer: SpeechToText) => {
 };
 
 const removeSelected = () => {
+	$('#keyboard').val('');
 	$(".transcribed-text").removeClass("selected");
 }
 const removePopovers = () => {
@@ -114,15 +115,21 @@ $('#keyboard').keyboard({
 		clearTimeout(internalTimer);
 	},
 	accepted : function(event: any, keyboard: any, el: any) {
-		$(".selected").text(el.value);
+		var value = el.value;
+		
+		$(".selected").text(value);
+		
 	},
 	canceled: function(event: Event, keyboard: any, el: any) {
 		removeSelected();
 	},
 	beforeClose: function() {
+		
+		
+		
 		setTimeout(function() {
 			removeSelected();
-		});
+		}, 100);
 	}
 });
 
