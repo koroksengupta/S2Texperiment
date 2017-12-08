@@ -12,7 +12,7 @@ const readFile = fileName => {
 			} else {
 				const content = data.toString();
 				const obj = {
-					paragraphs: _.reject(content.split('\r\n'), _.isEmpty)
+					paragraphs: _.reject(content.split('\n'), _.isEmpty)
 				};
 				resolve(obj);
 			}
