@@ -1,6 +1,6 @@
 const fs = require('fs');
 const _ = require('lodash');
-const fileName = 'phrases1.txt';
+const fileName = 'phrases2.txt';
 const filePath = __dirname + '/' + fileName;
 const desPath = __dirname + '/inputs.json';
 
