@@ -1,11 +1,11 @@
 import {createContainer, wrapWithSpan, splitText } from './utils';
+import * as _ from 'lodash';
 import { SpeechToText } from './speechtotext';
-
 declare var Levenshtein: any;
 declare var webkitSpeechRecognition:any;
 declare var $:any;
 
-
+var selectedWord: string;
 //TODO:
 // currently if editing is done then added element will taken as one word.
 
@@ -68,6 +68,7 @@ const removeSelected = () => {
 	$(".transcribed-text").removeClass("selected");
 }
 const removePopovers = () => {
+	selectedWord = ''
 	$(".popover").popover('destroy');
 }
 
@@ -94,6 +95,10 @@ function startTimer($key:any, isAction: any) {
 	}, isAction ? actionKeyHoverTimer : regularKeyHoverTimer);
 }
 
+const updateText = (text: string) => {
+	$(".selected").text(text);
+}
+
 $('#keyboard').keyboard({
 	repeatDelay: regularKeyHoverRepeat,
 	repeatRate: regularKeyRepeatRate,
@@ -116,24 +121,25 @@ $('#keyboard').keyboard({
 	},
 	accepted : function(event: any, keyboard: any, el: any) {
 		var value = el.value;
-		
-		$(".selected").text(value);
-		
+		updateText(value);
 	},
 	canceled: function(event: Event, keyboard: any, el: any) {
 		removeSelected();
 	},
 	beforeClose: function() {
-		
-		
-		
 		setTimeout(function() {
 			removeSelected();
 		}, 100);
 	}
 });
 
-
+const wordsWithRange = (word: string) => {
+	const wordLength = word.length;
+	return (newWord: string) => {
+		const len = newWord.length;
+		return ((wordLength + 1) === len || (wordLength - 1) === len || wordLength === len);
+	}
+}
 
 const bindEvents = (speechRecognizer: SpeechToText) => {
 	startBtn!.addEventListener('click', (evt: MouseEvent) => {
@@ -173,7 +179,8 @@ const bindEvents = (speechRecognizer: SpeechToText) => {
 			$(evt.currentTarget).removeAttr('disabled');
 		}
 	});
-
+	var hellows:[[string]] = [['hello world', 'this is shit'], ['love the way', 'talk you']];
+	var ajaxTimer: number;
 	$('body').popover({
 		selector: '.transcribed-text',
 		trigger: 'click',
@@ -181,10 +188,38 @@ const bindEvents = (speechRecognizer: SpeechToText) => {
 		placement: 'bottom',
 		toggle: true,
 		content() {
-			return `<div class="btn-group" role="group" aria-label="Option Buttons">
-			<button type="button" class="btn btn-success" id="edit">Edit</button>
-			<button type="button" class="btn btn-danger" id="delete">Delete</button>
-		  </div>`;
+			const api = `/similarwords?word=${selectedWord}`;
+			if (ajaxTimer) {
+				clearTimeout(ajaxTimer);
+			}
+			ajaxTimer = setTimeout(() => {
+				$.ajax({
+					url: api,
+					method: 'GET'
+				}).then((result: any) => {
+					var elem = result.data.filter(wordsWithRange(selectedWord)).map(elem => `<li class="list-group-item">${elem}</li>`).join('');
+					$('#thesaurus').text('').append(`<ul class="list-group"> ${elem} </ul>`)
+				}).catch((err: any) => {
+					console.log(`Error occoured while processing request`, err);
+				});
+
+			}, 100);
+
+					const buttons =  `
+					<div class='row' id='thesaurus'>
+						<img src='./images/loading.gif' />
+					</div>
+					<div class='row'>
+					<div class="btn-group" role="group" aria-label="Option Buttons">
+					
+					<button type="button" class="btn btn-success" id="edit">Edit</button>
+
+					<button type="button" class="btn btn-danger" id="delete">Delete</button>
+				  	</div>
+					</div>
+					
+				  `;
+			return buttons;
 		}
 	});
 
@@ -195,6 +230,7 @@ const bindEvents = (speechRecognizer: SpeechToText) => {
 			if (elem.hasClass('selected')) return;
 			removeSelected();
 			removePopovers();
+			selectedWord = elem.text();
 			elem.addClass('selected');
 			elem.click();
 		}, 1000);
@@ -221,6 +257,12 @@ const bindEvents = (speechRecognizer: SpeechToText) => {
 		clearInterval(timer);
 	});
 };
+$(document).on('click', '.list-group-item', (evt: MouseEvent) => {
+	const text =(<HTMLElement>evt.target).textContent 
+	updateText(text);
+	removeSelected();
+	removePopovers();
+})
 
 const initializeApp = (paragraphs: string[]) => {
 	// setup buttons
@@ -250,7 +292,6 @@ const loadJson = (filePath:string) => {
 window.addEventListener('load', (evt:Event) => {
 	loadJson('inputs.json');
 });
-
 
 
 

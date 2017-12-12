@@ -2,7 +2,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const fileName = 'phrases2.txt';
 const filePath = __dirname + '/' + fileName;
-const desPath = __dirname + '/inputs.json';
+const desPath = __dirname + '/public/inputs.json';
 
 const readFile = fileName => {
 	return new Promise((resolve, reject) => {

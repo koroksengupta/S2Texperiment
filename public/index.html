@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>S2Tv1</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/keyboard.css">
+	<link rel="stylesheet" href="assets/css/style.css">
+	<link href="docs/css/jquery-ui.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="docs/css/font-awesome.min.css">
+	<link href="docs/css/tipsy.css" rel="stylesheet">
+	<link href="docs/css/prettify.css" rel="stylesheet">
+	<link href="docs/css/ramin.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="navbar navbar-default navbar-static-top">
+		<div class="container-fluid">
+			<h3>Speech To Text Demo</h3>
+		</div>
+	</div>
+	<div class="container">
+		<div class="col-sx-12">
+			<div class="row">
+				<div class="col-xs-6 text-center">
+					<div id="paragraph-container"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="row result-container well">
+					<div id="result">
+
+					</div>
+					<div id="wrap" class="keyboard-container">
+						<input id="keyboard" type="text" class="hell" onclick="return false;"/>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<div class="col-sx-12">
+			<div class="button-container">
+				<button class="btn btn-default" id="btn-start">Start</button>
+				<button class="btn btn-info" id="btn-edit">Edit</button>
+				<button class="btn btn-success" id="btn-ok">Ok</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="js/levenshtein.js"></script>
+	<script src='js/jquery-3.2.1.min.js'></script>
+	<script src="docs/js/jquery-ui.min.js"></script>
+	<script src="js/jquery.keyboard.js"></script>
+	<script src="js/jquery.keyboard.extension-caret.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="docs/js/jquery.tipsy.min.js"></script>
+	<script src="dist/bundle.js"></script>
+</body>
+
+</html>
