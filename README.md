@@ -1,6 +1,14 @@
 # S2Texperiment
 
-### Objective: Improve Text Entry and editing process via gaze and voice. 
+### Objective 
+Improve Text Entry and editing process via gaze and voice. 
+
+### Contents
+1. Literature Folder - Contains pertinenet background literature for better understanding the motivation.
+2. Multimodal Text Editing update.docx - Tentative guideline for proposal.
+3. Text Editing Worklist - Comprehensive list of text editing features from Google voice API.
+4. Wireframes - Tentative layout (needs to be improved).
+5. Phrases.text - Sentence set for unconstrained text entry evaluation.
 
 
 # Running application
