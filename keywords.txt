@@ -1,0 +1,29 @@
+1. Start Listening
+2. Stop Listening
+
+
+3. Go to start of Line.
+4. Go to end of Line.
+5. Go to start of Paragraph.
+6. Go to end of Paragraph.
+7. Select "World"
+8. Go forward - (go one word foreword)
+9. Go backward - (go one word backward)
+
+ When editing mode is active and word is selected
+ 1. delete
+ 2. cut
+ 3. paste
+ 4. copy
+ 5. go forward (move cursor one character)
+ 6. go backward (move cursor one character)
+ 
+ 7. insert (insert mode is enabled and allow to speak) // showing new input field and accept or cancel button
+ 
+ When predicted words are shown.
+ 1. go up
+ 2. go down
+ 3. close
+
+We have to find some way to activate editing mode. (may be clicking button using eye gaze) 
+All above command assumes the editing mode is activated except 1 and 2.
